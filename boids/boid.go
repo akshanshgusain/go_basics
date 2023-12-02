@@ -37,5 +37,9 @@ func createBoid(id int) {
 	}
 
 	boids[id] = &b
+	// add boid's initial position to boidMap
+	boidMap[int(b.position.x)][int(b.position.y)] = b.id
+
+	// start each boid in separate thead(Green-Thread/User-Level Threads/Go-Routines)
 	go b.start()
 }

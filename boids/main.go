@@ -45,7 +45,6 @@ func Run() {
 		for j := range row {
 			boidMap[i][j] = -1
 		}
-
 	}
 
 	for i := 0; i < boidCount; i++ {
