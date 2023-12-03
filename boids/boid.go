@@ -12,6 +12,8 @@ type Boid struct {
 }
 
 func (b *Boid) moveOne() {
+	b.velocity = b.velocity.Add(b.calcAcceleration()).Limit(-1, 1)
+
 	// before moving reset the boid's position to -1
 	boidMap[int(b.position.x)][int(b.position.y)] = -1
 
@@ -27,6 +29,10 @@ func (b *Boid) moveOne() {
 	if next.y >= screenHeight || next.y < 0 {
 		b.velocity = Vector2D{b.velocity.x, -b.velocity.y}
 	}
+}
+
+func (b *Boid) calcAcceleration() Vector2D {
+
 }
 
 func (b *Boid) start() {
