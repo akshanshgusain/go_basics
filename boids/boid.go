@@ -1,6 +1,7 @@
 package boids
 
 import (
+	"math"
 	"math/rand"
 	"time"
 )
@@ -32,7 +33,29 @@ func (b *Boid) moveOne() {
 }
 
 func (b *Boid) calcAcceleration() Vector2D {
+	upper, lower := b.position.AddValue(viewRadius), b.position.AddValue(-viewRadius)
+	avgVelocity := Vector2D{0, 0}
 
+	var count = 0.0
+
+	for i := math.Max(lower.x, 0); i <= math.Min(upper.x, screenWidth); i++ {
+		for j := math.Max(lower.y, 0); j <= math.Min(upper.y, screenHeight); j++ {
+			if otherBId := boidMap[int(i)][int(j)]; otherBId != -1 && otherBId != b.id {
+				if dist := boids[otherBId].position.Distance(b.position); dist < viewRadius {
+					count++
+					avgVelocity = avgVelocity.Add(boids[otherBId].velocity)
+				}
+			}
+		}
+	}
+
+	accel := Vector2D{0, 0}
+	if count > 0 {
+		avgVelocity = avgVelocity.DivisionValue(count)
+		accel = avgVelocity.Subtract(b.velocity).MultiplyValue(adjRate)
+	}
+
+	return accel
 }
 
 func (b *Boid) start() {
