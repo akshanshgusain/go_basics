@@ -12,7 +12,14 @@ type Boid struct {
 }
 
 func (b *Boid) moveOne() {
+	// before moving reset the boid's position to -1
+	boidMap[int(b.position.x)][int(b.position.y)] = -1
+
 	b.position = b.position.Add(b.velocity)
+
+	// update the position of boid
+	boidMap[int(b.position.x)][int(b.position.y)] = b.id
+
 	next := b.position.Add(b.velocity)
 	if next.x >= screenWidth || next.x < 0 {
 		b.velocity = Vector2D{-b.velocity.x, b.velocity.y}
