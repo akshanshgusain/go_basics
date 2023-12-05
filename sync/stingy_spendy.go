@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+// Thread Synchronisation
+// Using Mutex to avoid Race Condition
+// making sure only one thread update the money at a time
+
 var (
 	money = 100
 	lock  = sync.Mutex{}
