@@ -15,7 +15,7 @@ type Boid struct {
 func (b *Boid) moveOne() {
 	acceleration := b.calcAcceleration()
 
-	lock.Lock()
+	rWLock.Lock()
 	b.velocity = b.velocity.Add(acceleration).Limit(-1, 1)
 
 	// before moving reset the boid's position to -1
@@ -33,7 +33,7 @@ func (b *Boid) moveOne() {
 	if next.y >= screenHeight || next.y < 0 {
 		b.velocity = Vector2D{b.velocity.x, -b.velocity.y}
 	}
-	lock.Unlock()
+	rWLock.Unlock()
 }
 
 func (b *Boid) calcAcceleration() Vector2D {
@@ -41,7 +41,7 @@ func (b *Boid) calcAcceleration() Vector2D {
 	avgPosition, avgVelocity := Vector2D{0, 0}, Vector2D{0, 0}
 	var count = 0.0
 
-	lock.Lock()
+	rWLock.RLock()
 	for i := math.Max(lower.x, 0); i <= math.Min(upper.x, screenWidth); i++ {
 		for j := math.Max(lower.y, 0); j <= math.Min(upper.y, screenHeight); j++ {
 			if otherBId := boidMap[int(i)][int(j)]; otherBId != -1 && otherBId != b.id {
@@ -53,7 +53,7 @@ func (b *Boid) calcAcceleration() Vector2D {
 			}
 		}
 	}
-	lock.Unlock()
+	rWLock.RUnlock()
 
 	accel := Vector2D{0, 0}
 	if count > 0 {
