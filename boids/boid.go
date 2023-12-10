@@ -26,13 +26,6 @@ func (b *Boid) moveOne() {
 	// update the position of boid
 	boidMap[int(b.position.x)][int(b.position.y)] = b.id
 
-	next := b.position.Add(b.velocity)
-	if next.x >= screenWidth || next.x < 0 {
-		b.velocity = Vector2D{-b.velocity.x, b.velocity.y}
-	}
-	if next.y >= screenHeight || next.y < 0 {
-		b.velocity = Vector2D{b.velocity.x, -b.velocity.y}
-	}
 	rWLock.Unlock()
 }
 
@@ -56,7 +49,9 @@ func (b *Boid) calcAcceleration() Vector2D {
 	}
 	rWLock.RUnlock()
 
-	accel := Vector2D{0, 0}
+	accel := Vector2D{b.borderBounce(b.position.x, screenWidth),
+		b.borderBounce(b.position.y, screenHeight)}
+
 	if count > 0 {
 		avgVelocity = avgVelocity.DivisionValue(count)
 		avgPosition = avgPosition.DivisionValue(count)
@@ -89,4 +84,13 @@ func createBoid(id int) {
 
 	// start each boid in separate thead(Green-Thread/User-Level Threads/Go-Routines)
 	go b.start()
+}
+
+func (b *Boid) borderBounce(pos, maxBorderPos float64) float64 {
+	if pos < viewRadius {
+		return 1 / pos
+	} else if pos > maxBorderPos-viewRadius {
+		return 1 / (pos - maxBorderPos)
+	}
+	return 0
 }
